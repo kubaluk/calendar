@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  all:
+    restart: unless-stopped
+    container_name: calendar
+    image: node:16.13-slim
+    volumes:
+      - ".:/usr/app"
+      - "root_node_modules:/usr/app/node_modules"
+      - "api_node_modules:/usr/app/apps/api/node_modules"
+      - "web_node_modules:/usr/app/apps/web/node_modules"
+    working_dir: /usr/app
+    command: sh -c "apt-get update -y && apt-get install openssl procps git -y && corepack disable && corepack enable && yarn install && yarn prisma generate --schema=./apps/api/prisma/schema.prisma && yarn prisma migrate deploy --schema=./apps/api/prisma/schema.prisma && yarn dev"
+    ports:
+      - "4000:4000"
+      - "3000:3000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+  db:
+    container_name: calendar-db
+    image: postgres:12.5
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+volumes:
+  web_node_modules:
+  api_node_modules:
+  root_node_modules:
