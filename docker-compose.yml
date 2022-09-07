@@ -20,8 +20,10 @@ services:
     ports:
       - "3000:3000"
       - "4000:4000"
-    environment:
-      - STRAPI_VERSION=4.0.2 #specify your strapi version here (need to be same as package.json)
+    env_file:
+        - ./.env #shared env file with strapi application 
+    depends_on:
+      - db
     volumes:
       - ./:/app/
        # Just specify a path and let the Engine create a volume
