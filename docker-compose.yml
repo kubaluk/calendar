@@ -24,6 +24,7 @@ services:
         - ./.env #shared env file with strapi application 
     depends_on:
       - db
+    command: sh -c "yarn install && yarn dev"
     volumes:
       - ./:/app/
        # Just specify a path and let the Engine create a volume
