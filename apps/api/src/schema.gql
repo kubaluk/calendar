@@ -5,9 +5,17 @@
 type User {
   id: Int!
   email: String!
-  password: String!
 }
 
 type Query {
   users: [User!]!
+}
+
+type Mutation {
+  login(loginUserInput: LoginUserInput!): User!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
 }

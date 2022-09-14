@@ -16,6 +16,7 @@ import { PrismaModule } from "./prisma/prisma.module";
       debug: false,
       playground: true,
       autoSchemaFile: join(process.cwd(), "src/schema.gql"),
+      context: ({ req, res }) => ({ req, res }),
     }),
     PrismaModule,
     AuthModule,

@@ -1,22 +1,49 @@
-import { NotFoundException } from "@nestjs/common";
+import {
+  ExecutionContext,
+  NotFoundException,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import {
   Args,
+  Context,
+  GqlExecutionContext,
+  GraphQLExecutionContext,
   Mutation,
-  Parent,
   Query,
-  ResolveField,
   Resolver,
-  Subscription,
 } from "@nestjs/graphql";
 import { AuthService } from "./auth.service";
+import { LoginUserInput } from "./dto/login-user-input.dto";
 import { User } from "./models/user.model";
+import { JwtService } from "@nestjs/jwt";
+import { GqlAuthGuard } from "./gql-auth-guard";
+import { Response } from "express";
 
 @Resolver((of) => User)
 export class AuthResolver {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  @Query((returns) => [User])
+  @Query((returns) => [User], { name: "users" })
+  @UseGuards(GqlAuthGuard)
   async users() {
     return this.authService.findAll();
+  }
+
+  @Mutation((returns) => User)
+  async login(
+    @Args("loginUserInput") loginUserInput: LoginUserInput,
+    @Context("res") res,
+  ) {
+    const payload = await this.authService.login(loginUserInput);
+
+    res.cookie(
+      "token",
+      this.jwtService.sign({ username: payload.email, sub: payload.id }),
+    );
+    return payload;
   }
 }
