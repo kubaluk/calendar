@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { User, Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import * as argon2 from "argon2";
@@ -19,14 +19,15 @@ export class AuthService {
       },
     });
 
-    const verifyPassword = await argon2.verify(user?.password, password);
+    const verifyPassword =
+      user && (await argon2.verify(user?.password, password));
 
     if (user && verifyPassword) {
       const { password, ...result } = user;
       return result;
     }
 
-    return null;
+    throw new BadRequestException();
   }
 
   async login(loginUserInput: LoginUserInput) {
