@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { User, Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import * as argon2 from "argon2";
 import { LoginUserInput } from "./dto/login-user-input.dto";
@@ -7,10 +6,6 @@ import { LoginUserInput } from "./dto/login-user-input.dto";
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaService) {}
-
-  async findAll() {
-    return this.prisma.user.findMany();
-  }
 
   async validateUser(username: string, password: string) {
     const user = await this.prisma.user.findUnique({

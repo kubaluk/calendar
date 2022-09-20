@@ -1,21 +1,18 @@
-import { ApolloDriverConfig, ApolloDriver } from "@nestjs/apollo";
 import { Module } from "@nestjs/common";
-import { GraphQLModule } from "@nestjs/graphql";
+import { ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
-import { join } from "@prisma/client/runtime";
-import { AppModule } from "src/app.module";
-import { PrismaService } from "src/prisma/prisma.service";
 import { AuthResolver } from "./auth.resolver";
 import { AuthService } from "./auth.service";
 import { JwtStrategy } from "./jwt.strategy";
+const service = new ConfigService();
 
 @Module({
   imports: [
     PassportModule,
     JwtModule.register({
       signOptions: { expiresIn: "3600s" },
-      secret: "changeThat",
+      secret: service.get<string>("TOKEN_SECRET"),
     }),
   ],
   providers: [AuthResolver, AuthService, JwtStrategy],
