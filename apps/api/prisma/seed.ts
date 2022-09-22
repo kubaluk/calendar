@@ -4,14 +4,34 @@ const prisma = new PrismaClient();
 
 async function main() {
   const hash = await argon2.hash("password");
-  const email = "user@example.com";
 
-  await prisma.user.upsert({
-    where: { email: email },
+  const emails = ["user@example.com", "user1@example.com"];
+
+  emails.forEach(
+    async (email) =>
+      await prisma.user.upsert({
+        where: { email: email },
+        update: {},
+        create: {
+          email: email,
+          password: hash,
+        },
+      }),
+  );
+
+  await prisma.calendar.upsert({
+    where: { id: 1 },
     update: {},
     create: {
-      email: email,
-      password: hash,
+      ownerId: 1,
+    },
+  });
+
+  await prisma.calendar.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+      ownerId: 2,
     },
   });
 }
